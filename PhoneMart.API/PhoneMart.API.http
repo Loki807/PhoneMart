@@ -1,0 +1,6 @@
+@PhoneMart.API_HostAddress = http://localhost:5236
+
+GET {{PhoneMart.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

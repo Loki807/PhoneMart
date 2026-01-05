@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="PhoneMart.API/PhoneMart.API.csproj" />
+    <Project Path="PhoneMart.Application/PhoneMart.Application.csproj" />
+    <Project Path="PhoneMart.Domain/PhoneMart.Domain.csproj" />
+    <Project Path="PhoneMart.Infrastructure/PhoneMart.Infrastructure.csproj" />
+    <Project Path="PhoneMart.Persistence/PhoneMart.Persistence.csproj" />
+  </Folder>
+</Solution>
