@@ -12,8 +12,8 @@ using PhoneMart.Persistence.Data;
 namespace PhoneMart.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260103165502_nje")]
-    partial class nje
+    [Migration("20260111053759_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,6 +74,42 @@ namespace PhoneMart.Persistence.Migrations
                             Id = 3,
                             Name = "Accessories"
                         });
+                });
+
+            modelBuilder.Entity("PhoneMart.Domain.Entities.EmailOtp", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email");
+
+                    b.HasIndex("Email", "Code");
+
+                    b.ToTable("EmailOtps");
                 });
 
             modelBuilder.Entity("PhoneMart.Domain.Entities.Product", b =>
