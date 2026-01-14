@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PhoneMart.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class nje : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,6 +37,22 @@ namespace PhoneMart.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailOtps",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiresAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailOtps", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -161,6 +177,15 @@ namespace PhoneMart.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_EmailOtps_Email",
+                table: "EmailOtps",
+                column: "Email");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailOtps_Email_Code",
+                table: "EmailOtps",
+                columns: new[] { "Email", "Code" });
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_BrandId",
                 table: "Products",
                 column: "BrandId");
@@ -196,6 +221,9 @@ namespace PhoneMart.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "EmailOtps");
+
             migrationBuilder.DropTable(
                 name: "Products");
 

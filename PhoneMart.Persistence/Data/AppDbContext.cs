@@ -16,6 +16,9 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<WholesaleListing> WholesaleListings { get; set; } = default!;
 
+    // ✅ OTP DbSet
+    public DbSet<EmailOtp> EmailOtps { get; set; } = default!;
+
     // ✅ Interface exposes IQueryable (Kaappaan style)
     IQueryable<User> IAppDbContext.Users => Users;
     IQueryable<Shop> IAppDbContext.Shops => Shops;
@@ -23,6 +26,8 @@ public class AppDbContext : DbContext, IAppDbContext
     IQueryable<Brand> IAppDbContext.Brands => Brands;
     IQueryable<Product> IAppDbContext.Products => Products;
     IQueryable<WholesaleListing> IAppDbContext.WholesaleListings => WholesaleListings;
+    IQueryable<EmailOtp> IAppDbContext.EmailOtps => EmailOtps;
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,6 +63,28 @@ public class AppDbContext : DbContext, IAppDbContext
             .Property(w => w.UnitPrice)
             .HasPrecision(18, 2);
 
+        // ✅ OTP table configuration (IMPORTANT)
+        modelBuilder.Entity<EmailOtp>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Email)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            entity.Property(x => x.Code)
+                .IsRequired()
+                .HasMaxLength(10);
+
+            // ✅ Index for fast lookup
+            entity.HasIndex(x => x.Email);
+            entity.HasIndex(x => new { x.Email, x.Code });
+
+            // optional: default false
+            entity.Property(x => x.IsUsed)
+                .HasDefaultValue(false);
+        });
+
         // ✅ Seed Categories
         modelBuilder.Entity<Category>().HasData(
             new Category { Id = 1, Name = "Used Phones" },
@@ -81,6 +108,5 @@ public class AppDbContext : DbContext, IAppDbContext
         => await Set<T>().FindAsync(new object[] { id }, cancellationToken);
 
     public void RemoveEntity<T>(T entity) where T : class
-     => Set<T>().Remove(entity);
-
+        => Set<T>().Remove(entity);
 }
