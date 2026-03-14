@@ -11,6 +11,7 @@ public interface IAppDbContext
     IQueryable<Brand> Brands { get; }
     IQueryable<Product> Products { get; }
     IQueryable<WholesaleListing> WholesaleListings { get; }
+    IQueryable<Rating> Ratings { get; }
 
     // ✅ Generic helpers (Kaappaan style)
     Task AddEntityAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class;

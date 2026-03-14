@@ -60,6 +60,7 @@ public class CreateShopOwnerHandler : IRequestHandler<CreateShopOwnerCommand, Gu
             WhatsAppNumber = dto.WhatsAppNumber?.Trim() ?? "",
             CallNumber = dto.PhoneNumber.Trim(),
             IsVerified = false,
+            ImageUrl = dto.ImageUrl?.Trim(),
             CreatedAt = DateTime.UtcNow
         };
 

@@ -30,6 +30,7 @@ public class GetShopByIdHandler : IRequestHandler<GetShopByIdQuery, ShopDetailsD
                 WhatsAppNumber = s.WhatsAppNumber,
                 CallNumber = s.CallNumber,
                 IsVerified = s.IsVerified,
+                ImageUrl = s.ImageUrl,
                 CreatedAt = s.CreatedAt
             })
             .FirstOrDefault();

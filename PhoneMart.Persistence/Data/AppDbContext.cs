@@ -15,6 +15,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Brand> Brands { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<WholesaleListing> WholesaleListings { get; set; } = default!;
+    public DbSet<Rating> Ratings { get; set; } = default!;
 
     // ✅ Interface exposes IQueryable (Kaappaan style)
     IQueryable<User> IAppDbContext.Users => Users;
@@ -23,6 +24,7 @@ public class AppDbContext : DbContext, IAppDbContext
     IQueryable<Brand> IAppDbContext.Brands => Brands;
     IQueryable<Product> IAppDbContext.Products => Products;
     IQueryable<WholesaleListing> IAppDbContext.WholesaleListings => WholesaleListings;
+    IQueryable<Rating> IAppDbContext.Ratings => Ratings;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -57,6 +59,24 @@ public class AppDbContext : DbContext, IAppDbContext
         modelBuilder.Entity<WholesaleListing>()
             .Property(w => w.UnitPrice)
             .HasPrecision(18, 2);
+
+        // ✅ Rating: Shop 1 - many Ratings
+        modelBuilder.Entity<Rating>()
+            .HasOne(r => r.Shop)
+            .WithMany()
+            .HasForeignKey(r => r.ShopId)
+            .OnDelete(DeleteBehavior.NoAction);  // Prevent cascade delete conflict
+
+        modelBuilder.Entity<Rating>()
+            .HasOne(r => r.Rater)
+            .WithMany()
+            .HasForeignKey(r => r.RaterUserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // ✅ Unique: one rating per rater per shop (enforced at DB level)
+        modelBuilder.Entity<Rating>()
+            .HasIndex(r => new { r.ShopId, r.RaterUserId })
+            .IsUnique();
 
         // ✅ Seed Categories
         modelBuilder.Entity<Category>().HasData(

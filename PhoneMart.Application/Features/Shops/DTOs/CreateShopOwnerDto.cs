@@ -13,4 +13,5 @@ public class CreateShopOwnerDto
     public string WhatsAppNumber { get; set; } = "";
     public string Address { get; set; } = "";
     public string City { get; set; } = "";
+    public string? ImageUrl { get; set; }
 }

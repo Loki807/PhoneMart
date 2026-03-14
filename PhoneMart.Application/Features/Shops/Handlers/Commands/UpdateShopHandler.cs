@@ -31,6 +31,7 @@ public class UpdateShopHandler : IRequestHandler<UpdateShopCommand, Guid>
         shop.WhatsAppNumber = dto.WhatsAppNumber?.Trim() ?? "";
         shop.CallNumber = dto.CallNumber.Trim();
         shop.IsVerified = dto.IsVerified;
+        shop.ImageUrl = dto.ImageUrl?.Trim();
 
         _db.UpdateEntity(shop);
         await _db.SaveChangesAsync(cancellationToken);

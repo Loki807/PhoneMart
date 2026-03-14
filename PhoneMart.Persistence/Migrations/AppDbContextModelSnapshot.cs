@@ -128,6 +128,37 @@ namespace PhoneMart.Persistence.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("PhoneMart.Domain.Entities.Rating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("RaterUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ShopId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Stars")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RaterUserId");
+
+                    b.HasIndex("ShopId", "RaterUserId")
+                        .IsUnique();
+
+                    b.ToTable("Ratings");
+                });
+
             modelBuilder.Entity("PhoneMart.Domain.Entities.Shop", b =>
                 {
                     b.Property<Guid>("Id")
@@ -147,6 +178,9 @@ namespace PhoneMart.Persistence.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
@@ -277,6 +311,25 @@ namespace PhoneMart.Persistence.Migrations
                     b.Navigation("Brand");
 
                     b.Navigation("Category");
+
+                    b.Navigation("Shop");
+                });
+
+            modelBuilder.Entity("PhoneMart.Domain.Entities.Rating", b =>
+                {
+                    b.HasOne("PhoneMart.Domain.Entities.User", "Rater")
+                        .WithMany()
+                        .HasForeignKey("RaterUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("PhoneMart.Domain.Entities.Shop", "Shop")
+                        .WithMany()
+                        .HasForeignKey("ShopId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Rater");
 
                     b.Navigation("Shop");
                 });

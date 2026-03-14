@@ -12,4 +12,5 @@ public class UpdateShopDto
     public string CallNumber { get; set; } = "";
 
     public bool IsVerified { get; set; }
+    public string? ImageUrl { get; set; }
 }

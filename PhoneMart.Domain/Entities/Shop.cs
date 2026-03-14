@@ -17,6 +17,7 @@ public class Shop
     public string CallNumber { get; set; } = "";
 
     public bool IsVerified { get; set; } = false;
+    public string? ImageUrl { get; set; } // Shop logo or photo
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Relationship: One Shop -> Many Products

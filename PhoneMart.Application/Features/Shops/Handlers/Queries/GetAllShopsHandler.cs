@@ -30,6 +30,7 @@ public class GetAllShopsHandler : IRequestHandler<GetAllShopsQuery, List<ShopDet
                 WhatsAppNumber = s.WhatsAppNumber,
                 CallNumber = s.CallNumber,
                 IsVerified = s.IsVerified,
+                ImageUrl = s.ImageUrl,
                 CreatedAt = s.CreatedAt
             })
             .ToList();
