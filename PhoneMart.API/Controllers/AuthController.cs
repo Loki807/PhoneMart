@@ -4,6 +4,7 @@ using PhoneMart.Application.Features.Auth.Requests.Commands;
 
 namespace PhoneMart.API.Controllers;
 
+
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
