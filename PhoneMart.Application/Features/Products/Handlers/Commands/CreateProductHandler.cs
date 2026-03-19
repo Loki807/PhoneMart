@@ -58,6 +58,7 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Guid>
             Warranty = dto.Warranty?.Trim(),
             Description = dto.Description?.Trim(),
             ImageUrl = dto.ImageUrl?.Trim(),
+            StockQuantity = dto.StockQuantity < 1 ? 1 : dto.StockQuantity,
             Status = ListingStatus.Active,   // New products are always Active
             CreatedAt = DateTime.UtcNow
         };

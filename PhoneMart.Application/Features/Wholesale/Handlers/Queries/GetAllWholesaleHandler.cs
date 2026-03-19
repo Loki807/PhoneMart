@@ -46,6 +46,13 @@ public class GetAllWholesaleHandler : IRequestHandler<GetAllWholesaleQuery, List
             query = query.Where(w => w.ItemType == itemType);
         }
 
+        // Apply city filter (Shop is a navigation property, EF Core translates this to a JOIN)
+        if (!string.IsNullOrWhiteSpace(request.CityFilter))
+        {
+            var city = request.CityFilter.ToLower();
+            query = query.Where(w => w.SellerShop.City.ToLower().Contains(city));
+        }
+
         // Build the result with seller info from Shops table
         var listings = query
             .OrderByDescending(w => w.CreatedAt)
@@ -87,14 +94,6 @@ public class GetAllWholesaleHandler : IRequestHandler<GetAllWholesaleQuery, List
                 CreatedAt = w.CreatedAt
             })
             .ToList();
-
-        // Apply city filter in memory (after getting seller info)
-        if (!string.IsNullOrWhiteSpace(request.CityFilter))
-        {
-            listings = listings
-                .Where(l => l.SellerCity.Contains(request.CityFilter, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
 
         return Task.FromResult(listings);
     }

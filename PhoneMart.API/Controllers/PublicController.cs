@@ -40,6 +40,37 @@ public class PublicController : ControllerBase
     // ═════════════════════════════════════════════
 
     /// <summary>
+    /// GET /api/public/shops
+    /// 
+    /// Browse all verified shops on the platform.
+    /// Can be filtered by name or city.
+    /// </summary>
+    [HttpGet("shops")]
+    public IActionResult SearchShops([FromQuery] string? q, [FromQuery] string? city)
+    {
+        var query = _db.Shops.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(q))
+            query = query.Where(s => s.ShopName.ToLower().Contains(q.ToLower()));
+
+        if (!string.IsNullOrWhiteSpace(city))
+            query = query.Where(s => s.City.ToLower().Contains(city.ToLower()));
+
+        var result = query
+            .OrderBy(s => s.ShopName)
+            .Select(s => new
+            {
+                s.Id,
+                s.ShopName,
+                s.City,
+                s.WhatsAppNumber
+            })
+            .ToList();
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// GET /api/public/shops/{id}
     /// 
     /// View a single shop's public page.
@@ -98,14 +129,20 @@ public class PublicController : ControllerBase
         [FromQuery] string? q,
         [FromQuery] int? category,
         [FromQuery] string? city,
-        CancellationToken cancellationToken)
+        [FromQuery] int? brand,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(
             new SearchProductsQuery
             {
                 SearchTerm = q,
                 CategoryFilter = category,
-                CityFilter = city
+                CityFilter = city,
+                BrandFilter = brand,
+                Page = page,
+                PageSize = pageSize
             },
             cancellationToken);
 

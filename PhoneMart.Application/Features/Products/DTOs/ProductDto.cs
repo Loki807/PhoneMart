@@ -35,6 +35,8 @@ public class ProductDto
     public string? Description { get; set; }
     public string? ImageUrl { get; set; }
 
+    public int StockQuantity { get; set; }
+
     public string Status { get; set; } = "";   // "Active" / "Sold" / "Hidden" (string, not enum number)
     public DateTime CreatedAt { get; set; }
 }

@@ -44,8 +44,21 @@ public class SearchProductsHandler : IRequestHandler<SearchProductsQuery, List<P
         if (request.CategoryFilter.HasValue)
             query = query.Where(p => p.CategoryId == request.CategoryFilter.Value);
 
+        // Apply brand filter
+        if (request.BrandFilter.HasValue)
+            query = query.Where(p => p.BrandId == request.BrandFilter.Value);
+
+        // Apply city filter (Shop is a navigation property, EF Core translates this to a JOIN)
+        if (!string.IsNullOrWhiteSpace(request.CityFilter))
+        {
+            var city = request.CityFilter.ToLower();
+            query = query.Where(p => p.Shop.City.ToLower().Contains(city));
+        }
+
         var products = query
             .OrderByDescending(p => p.CreatedAt)
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
             .Select(p => new PublicProductDto
             {
                 Id = p.Id,
@@ -72,14 +85,6 @@ public class SearchProductsHandler : IRequestHandler<SearchProductsQuery, List<P
                 CreatedAt = p.CreatedAt
             })
             .ToList();
-
-        // Apply city filter in memory (city comes from shop sub-query)
-        if (!string.IsNullOrWhiteSpace(request.CityFilter))
-        {
-            products = products
-                .Where(p => p.ShopCity.Contains(request.CityFilter, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
 
         return Task.FromResult(products);
     }

@@ -1,0 +1,13 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+  PhoneMart.Domain -> C:\Users\Loki\Desktop\PhoneMart\PhoneMart\PhoneMart.Domain\bin\Debug\net9.0\PhoneMart.Domain.dll
+  PhoneMart.Application -> C:\Users\Loki\Desktop\PhoneMart\PhoneMart\PhoneMart.Application\bin\Debug\net9.0\PhoneMart.Application.dll
+  PhoneMart.Infrastructure -> C:\Users\Loki\Desktop\PhoneMart\PhoneMart\PhoneMart.Infrastructure\bin\Debug\net9.0\PhoneMart.Infrastructure.dll
+  PhoneMart.Persistence -> C:\Users\Loki\Desktop\PhoneMart\PhoneMart\PhoneMart.Persistence\bin\Debug\net9.0\PhoneMart.Persistence.dll
+  PhoneMart.API -> C:\Users\Loki\Desktop\PhoneMart\PhoneMart\PhoneMart.API\bin\Debug\net9.0\PhoneMart.API.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:04.01

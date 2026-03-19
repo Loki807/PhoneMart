@@ -14,4 +14,8 @@ public class SearchProductsQuery : IRequest<List<PublicProductDto>>
     public string? SearchTerm { get; set; }      // "iPhone 15"
     public int? CategoryFilter { get; set; }     // 1=Used, 2=New, 3=Accessories
     public string? CityFilter { get; set; }      // "Jaffna"
+    public int? BrandFilter { get; set; }        // 1=Apple, 2=Samsung
+
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 20;
 }

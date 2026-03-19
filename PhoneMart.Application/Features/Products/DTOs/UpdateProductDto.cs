@@ -24,6 +24,8 @@ public class UpdateProductDto
     public string? Description { get; set; }
     public string? ImageUrl { get; set; }
 
+    public int StockQuantity { get; set; } = 1;  // How many units available
+
     // Owner can change status (Active → Hidden, Hidden → Active, etc.)
     public int Status { get; set; } = 1;     // 1=Active, 2=Sold, 3=Hidden
 }

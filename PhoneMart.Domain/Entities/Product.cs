@@ -1,4 +1,4 @@
-﻿using PhoneMart.Domain.Enums;
+using PhoneMart.Domain.Enums;
 
 namespace PhoneMart.Domain.Entities;
 
@@ -28,6 +28,8 @@ public class Product
 
     public string? Description { get; set; }
     public string? ImageUrl { get; set; }
+
+    public int StockQuantity { get; set; } = 1;  // How many units in stock
 
     public ListingStatus Status { get; set; } = ListingStatus.Active;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

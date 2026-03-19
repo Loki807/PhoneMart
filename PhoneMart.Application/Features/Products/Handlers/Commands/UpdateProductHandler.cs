@@ -54,7 +54,13 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Guid>
         product.Warranty = dto.Warranty?.Trim();
         product.Description = dto.Description?.Trim();
         product.ImageUrl = dto.ImageUrl?.Trim();
-        product.Status = (ListingStatus)dto.Status;
+        product.StockQuantity = dto.StockQuantity < 0 ? 0 : dto.StockQuantity;
+
+        // Auto-set status to Sold if stock reaches 0
+        if (product.StockQuantity == 0 && (ListingStatus)dto.Status == ListingStatus.Active)
+            product.Status = ListingStatus.Sold;
+        else
+            product.Status = (ListingStatus)dto.Status;
 
         // Step 6: Save changes
         _db.UpdateEntity(product);

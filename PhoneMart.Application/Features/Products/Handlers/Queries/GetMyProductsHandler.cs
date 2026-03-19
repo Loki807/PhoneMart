@@ -63,6 +63,7 @@ public class GetMyProductsHandler : IRequestHandler<GetMyProductsQuery, List<Pro
                 Warranty = p.Warranty,
                 Description = p.Description,
                 ImageUrl = p.ImageUrl,
+                StockQuantity = p.StockQuantity,
                 Status = p.Status.ToString(),    // Enum → "Active" / "Sold" / "Hidden"
                 CreatedAt = p.CreatedAt
             })

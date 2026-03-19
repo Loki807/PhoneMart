@@ -26,4 +26,6 @@ public class CreateProductDto
 
     public string? Description { get; set; }
     public string? ImageUrl { get; set; }    // AWS S3 URL (uploaded separately)
+
+    public int StockQuantity { get; set; } = 1;  // How many units available
 }
