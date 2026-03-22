@@ -1,0 +1,28 @@
+name: 🚀 Deploy Backend to EC2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'PhoneMart/**'
+      - '!PhoneMart-Frontend/**'
+
+jobs:
+  deploy:
+    name: Build & Deploy Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔗 Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/PhoneMart
+            git pull https://${{ secrets.GIT_PAT }}@github.com/Loki807/PhoneMart.git main
+            cd PhoneMart/PhoneMart.API
+            sudo dotnet publish -c Release -o out
+            pm2 restart phonemart-api
+            echo "✅ Backend deployed successfully!"
