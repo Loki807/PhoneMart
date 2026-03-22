@@ -148,6 +148,9 @@ public class Program
             var db = scope.ServiceProvider.GetRequiredService<PhoneMart.Persistence.Data.AppDbContext>();
             var hasher = scope.ServiceProvider.GetRequiredService<PhoneMart.Application.Contracts.Identity.IPasswordHasher>();
 
+            // Auto-create database & apply all migrations (needed for fresh RDS)
+            await db.Database.MigrateAsync();
+
             await PhoneMart.Persistence.Seeds.AdminSeedData.SeedAsync(db, hasher);
             await PhoneMart.Persistence.Seeds.BrandSeedData.SeedAsync(db);
         }
