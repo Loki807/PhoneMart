@@ -23,6 +23,8 @@ jobs:
             cd ~/PhoneMart
             git pull https://${{ secrets.GIT_PAT }}@github.com/Loki807/PhoneMart.git master
             cd PhoneMart.API
+            # Delete old build and cache files
+            rm -rf bin obj out
             sudo dotnet publish -c Release -o out
             pm2 restart phonemart-api
-            echo "✅ Backend deployed successfully!"
+            echo "✅ Clean Backend deployed successfully!"
