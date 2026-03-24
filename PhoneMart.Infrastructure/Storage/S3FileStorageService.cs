@@ -40,11 +40,15 @@ public class S3FileStorageService : IFileStorageService
         var secretKey = awsConfig["SecretKey"] ?? "";
         var region = awsConfig["Region"] ?? "ap-south-1";
 
-        _s3Client = new AmazonS3Client(
-            accessKey,
-            secretKey,
-            Amazon.RegionEndpoint.GetBySystemName(region)
-        );
+        if (!string.IsNullOrEmpty(accessKey) && !accessKey.Contains("YOUR_AWS"))
+        {
+            _s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.GetBySystemName(region));
+        }
+        else
+        {
+            // Fallback to Default Credentials (e.g. IAM Instance Profile on EC2/EB)
+            _s3Client = new AmazonS3Client(Amazon.RegionEndpoint.GetBySystemName(region));
+        }
     }
 
     /// <summary>
@@ -67,7 +71,8 @@ public class S3FileStorageService : IFileStorageService
             BucketName = _bucketName,
             Key = uniqueName,
             InputStream = fileStream,
-            ContentType = GetContentType(extension)
+            ContentType = GetContentType(extension),
+            CannedACL = S3CannedACL.PublicRead
         };
 
         await _s3Client.PutObjectAsync(request);
