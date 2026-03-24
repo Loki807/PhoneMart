@@ -14,14 +14,10 @@ namespace PhoneMart.Infrastructure.Storage;
 ///   3. Each file gets a public URL
 ///   4. Frontend uses this URL to display the image
 /// 
-/// File naming:
-///   We generate unique names using GUID to prevent conflicts.
-///   Example: products/a1b2c3d4-photo.jpg
-/// 
 /// Configuration needed in appsettings.json:
 ///   "AWS": {
 ///     "BucketName": "phonemart-images",
-///     "Region": "ap-south-1",
+///     "Region": "ap-southeast-2",
 ///     "AccessKey": "your-key",
 ///     "SecretKey": "your-secret"
 ///   }
@@ -30,39 +26,41 @@ public class S3FileStorageService : IFileStorageService
 {
     private readonly IAmazonS3 _s3Client;
     private readonly string _bucketName;
+    private readonly string _region;
+    private readonly string? _cdnBaseUrl;
 
     public S3FileStorageService(IConfiguration config)
     {
         var awsConfig = config.GetSection("AWS");
         _bucketName = awsConfig["BucketName"] ?? "phonemart-images";
+        _region = awsConfig["Region"] ?? "ap-southeast-2";
+        
+        // App:BaseUrl normally points to CloudFront or the main domain
+        _cdnBaseUrl = config["App:BaseUrl"];
 
-        var accessKey = awsConfig["AccessKey"] ?? "";
-        var secretKey = awsConfig["SecretKey"] ?? "";
-        var region = awsConfig["Region"] ?? "ap-south-1";
+        var accessKey = awsConfig["AccessKey"];
+        var secretKey = awsConfig["SecretKey"];
 
         if (!string.IsNullOrEmpty(accessKey) && !accessKey.Contains("YOUR_AWS"))
         {
-            _s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.GetBySystemName(region));
+            _s3Client = new AmazonS3Client(
+                accessKey,
+                secretKey,
+                Amazon.RegionEndpoint.GetBySystemName(_region)
+            );
         }
         else
         {
             // Fallback to Default Credentials (e.g. IAM Instance Profile on EC2/EB)
-            _s3Client = new AmazonS3Client(Amazon.RegionEndpoint.GetBySystemName(region));
+            _s3Client = new AmazonS3Client(Amazon.RegionEndpoint.GetBySystemName(_region));
         }
     }
 
     /// <summary>
     /// Upload file to S3 and return its public URL.
-    /// 
-    /// Flow:
-    ///   1. Generate unique filename (GUID + original extension)
-    ///   2. Set the S3 key (folder/filename)
-    ///   3. Upload with public-read ACL (so the image is viewable)
-    ///   4. Return the public URL
     /// </summary>
     public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string folder)
     {
-        // Generate unique name: "products/a1b2c3d4-photo.jpg"
         var extension = Path.GetExtension(fileName);
         var uniqueName = $"{folder}/{Guid.NewGuid()}{extension}";
 
@@ -75,37 +73,54 @@ public class S3FileStorageService : IFileStorageService
             CannedACL = S3CannedACL.PublicRead
         };
 
-        await _s3Client.PutObjectAsync(request);
+        try
+        {
+            await _s3Client.PutObjectAsync(request);
+            
+            // If CloudFront/CDN URL is configured, use it for the returned link.
+            // Example: https://d1krxot6naclbu.cloudfront.net/products/abc-123.jpg
+            if (!string.IsNullOrEmpty(_cdnBaseUrl))
+            {
+                var cleanBase = _cdnBaseUrl.TrimEnd('/');
+                return $"{cleanBase}/{uniqueName}";
+            }
 
-        // Return the public URL
-        return $"https://{_bucketName}.s3.amazonaws.com/{uniqueName}";
+            // Direct S3 Regional URL: https://bucket.s3.region.amazonaws.com/uniqueName
+            return $"https://{_bucketName}.s3.{_region}.amazonaws.com/{uniqueName}";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"S3 UPLOAD FAILED: {ex.Message}");
+            throw new Exception("Image upload to AWS failed. Check your Bucket Policy and ACLs on the AWS S3 Console.", ex);
+        }
     }
 
     /// <summary>
     /// Delete file from S3 by its URL.
-    /// Extracts the key from the URL and deletes the object.
     /// </summary>
     public async Task DeleteFileAsync(string fileUrl)
     {
         if (string.IsNullOrEmpty(fileUrl)) return;
 
-        // Extract key from URL: "https://bucket.s3.amazonaws.com/products/file.jpg" → "products/file.jpg"
-        var uri = new Uri(fileUrl);
-        var key = uri.AbsolutePath.TrimStart('/');
-
-        var request = new DeleteObjectRequest
+        try
         {
-            BucketName = _bucketName,
-            Key = key
-        };
+            var uri = new Uri(fileUrl);
+            var key = uri.AbsolutePath.TrimStart('/');
 
-        await _s3Client.DeleteObjectAsync(request);
+            var request = new DeleteObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = key
+            };
+
+            await _s3Client.DeleteObjectAsync(request);
+        }
+        catch
+        {
+            // Ignore errors on delete to prevent breaking product deletion
+        }
     }
 
-    /// <summary>
-    /// Maps file extensions to MIME types for proper browser rendering.
-    /// Without this, browsers might download instead of display the image.
-    /// </summary>
     private static string GetContentType(string extension) => extension.ToLower() switch
     {
         ".jpg" or ".jpeg" => "image/jpeg",
